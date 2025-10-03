@@ -77,6 +77,9 @@ void main(List<String> args) async {
     }
   }
 
+  // Also update app router with a route to the generated page
+  await _updateRouter(feature: feature, classBase: classBase);
+
   stdout.writeln('Done. Next: run build_runner and wire navigation if needed.');
 }
 
@@ -93,6 +96,64 @@ ReCase _singular(ReCase rc) {
     return ReCase(word.substring(0, word.length - 1));
   }
   return rc;
+}
+
+Future<void> _updateRouter({required String feature, required String classBase}) async {
+  final File routerFile = File('lib/core/router/app_router.dart');
+  if (!await routerFile.exists()) {
+    stderr.writeln('Router file not found at lib/core/router/app_router.dart. Skipped routing update.');
+    return;
+  }
+
+  String content = await routerFile.readAsString();
+
+  // 1) Ensure import exists
+  final String importLine = "import '../../features/$feature/presentation/pages/${feature}_page.dart';";
+  if (!content.contains(importLine)) {
+    // Insert after the last existing import line
+    final RegExp importBlock = RegExp(r"(^import .+;\s*$)+", multiLine: true);
+    final Iterable<RegExpMatch> matches = importBlock.allMatches(content);
+    if (matches.isNotEmpty) {
+      final RegExpMatch last = matches.last;
+      final int insertIndex = last.end;
+      content = content.substring(0, insertIndex) + '\n' + importLine + content.substring(insertIndex);
+    } else {
+      // Fallback: prepend at top
+      content = importLine + '\n' + content;
+    }
+  }
+
+  // 2) Ensure route exists
+  final String routeSnippet =
+      "    GoRoute(\n"
+      "      path: '/$feature',\n"
+      "      name: '$feature',\n"
+      "      builder: (context, state) => const ${classBase}Page(),\n"
+      "    ),\n";
+
+  if (!content.contains("name: '$feature'")) {
+    // Insert before closing of routes list: \n  ],\n or \n  ]
+    final int routesStart = content.indexOf('routes: <GoRoute>[');
+    if (routesStart != -1) {
+      final int closingIndex = content.indexOf('],', routesStart);
+      final int fallbackClosing = content.indexOf(']\n', routesStart);
+      int insertAt = closingIndex != -1 ? closingIndex : fallbackClosing;
+      if (insertAt == -1) {
+        // Fallback: try last bracket
+        insertAt = content.lastIndexOf(']');
+      }
+      if (insertAt != -1) {
+        content = content.substring(0, insertAt) + routeSnippet + content.substring(insertAt);
+      } else {
+        stderr.writeln('Could not locate routes list to insert new route.');
+      }
+    } else {
+      stderr.writeln('Could not find routes list in router file.');
+    }
+  }
+
+  await routerFile.writeAsString(content);
+  stdout.writeln('Updated router with /$feature route.');
 }
 
 String _entityTemplate(String entity) =>
@@ -280,7 +341,7 @@ class ${classBase}Page extends StatelessWidget {
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (_, idx) => ListTile(title: Text(items[idx].toString())),
               ),
-              failure: (msg) => Center(child: Text('Error: ' + msg)),
+              failure: (msg) => Center(child: Text('Error: \$msg')),
             );
           },
         ),

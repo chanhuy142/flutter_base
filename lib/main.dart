@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/di/injection.dart';
-import 'features/posts/presentation/pages/posts_page.dart';
+import 'core/router/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +14,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Match App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const PostsPage(),
+      routerConfig: appRouter,
     );
   }
 }

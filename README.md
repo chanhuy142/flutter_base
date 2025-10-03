@@ -73,6 +73,20 @@ fvm flutter pub run build_runner build --delete-conflicting-outputs
 fvm flutter analyze
 ```
 
+## Routing
+- Sử dụng `go_router` với cấu hình trung tâm ở `core/router/app_router.dart`.
+- Định tuyến hiện tại:
+  - `/posts` → `PostsPage`
+  - `/comments` → `CommentsPage`
+- Tích hợp trong `main.dart` bằng `MaterialApp.router` với `routerConfig: appRouter`.
+- Điều hướng ví dụ:
+```dart
+import 'package:go_router/go_router.dart';
+
+// context.go('/comments');
+// context.push('/posts');
+```
+
 ## Module generator
 Tạo nhanh module Clean Architecture (domain/data/presentation + Bloc + Freezed + Injectable).
 
@@ -87,6 +101,8 @@ Sau khi sinh file, chạy codegen:
 fvm flutter pub run build_runner build --delete-conflicting-outputs
 ```
 Đi tới trang: `lib/features/<module>/presentation/pages/<module>_page.dart` hoặc thêm route để điều hướng.
+
+Lưu ý: Generator sẽ tự động thêm import và `GoRoute` vào `core/router/app_router.dart` (ví dụ: `/<module>` → `<Module>Page`).
 
 ### Quy ước đặt tên khi generate
 - **Module**: số nhiều (ví dụ `comments`, `posts`).
