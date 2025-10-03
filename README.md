@@ -64,6 +64,10 @@ lib/
 ```bash
 fvm flutter run
 ```
+- **Apply app identifiers (name/package)**:
+```bash
+fvm flutter pub run tool/app_identifier.dart
+```
 - **Codegen (freezed/injectable/json)**:
 ```bash
 fvm flutter pub run build_runner build --delete-conflicting-outputs
@@ -107,6 +111,23 @@ Lưu ý: Generator sẽ tự động thêm import và `GoRoute` vào `core/route
 ### Quy ước đặt tên khi generate
 - **Module**: số nhiều (ví dụ `comments`, `posts`).
 - **Entity/Model**: số ít tự động (ví dụ `Comment`, `Post`).
+
+## App Identifier
+- Cấu hình ở `app_identifier.yaml`:
+```yaml
+app_name: My App
+android_application_id: com.company.myapp
+ios_bundle_id: com.company.myapp
+web_title: My App
+```
+- Áp dụng thay đổi:
+```bash
+fvm flutter pub run tool/app_identifier.dart
+```
+Script sẽ cập nhật:
+- Android: `android/app/build.gradle.kts` (namespace, applicationId), `AndroidManifest.xml` (label)
+- iOS: `Runner.xcodeproj/project.pbxproj` (PRODUCT_BUNDLE_IDENTIFIER), `Info.plist` (CFBundleDisplayName/Name)
+- Web: `web/index.html` (title), `web/manifest.json` (name/short_name)
 
 ## Tùy biến nhanh
 - **Đổi API baseUrl**: `core/network/dio_module.dart` (`BaseOptions.baseUrl`).

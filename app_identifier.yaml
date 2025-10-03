@@ -1,0 +1,12 @@
+# Simple identifier config
+# app_name: Tên hiển thị của ứng dụng (Android label, iOS CFBundleDisplayName/Name, Web title)
+# android_application_id: Ứng dụng Android applicationId/namespace (ví dụ com.company.app)
+# ios_bundle_id: iOS PRODUCT_BUNDLE_IDENTIFIER (ví dụ com.company.app)
+# web_title: Ghi đè tiêu đề trang web (mặc định dùng app_name)
+
+app_name: Base App
+android_application_id: com.example.base_app
+ios_bundle_id: com.example.base_app
+web_title: Base App
+
+
