@@ -1,0 +1,57 @@
+//@GeneratedMicroModule;MatchPackageModule;package:match/core/di/register_module.module.dart
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// coverage:ignore-file
+
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:async' as _i687;
+
+import 'package:dio/dio.dart' as _i361;
+import 'package:injectable/injectable.dart' as _i526;
+import 'package:match/core/network/dio_module.dart' as _i997;
+import 'package:match/features/comments/data/datasources/comments_remote_data_source.dart'
+    as _i957;
+import 'package:match/features/comments/data/repositories/comments_repository_impl.dart'
+    as _i285;
+import 'package:match/features/comments/domain/repositories/comments_repository.dart'
+    as _i583;
+import 'package:match/features/comments/domain/usecases/get_comments.dart'
+    as _i849;
+import 'package:match/features/comments/presentation/bloc/comments_bloc.dart'
+    as _i950;
+import 'package:match/features/posts/data/datasources/posts_remote_data_source.dart'
+    as _i99;
+import 'package:match/features/posts/data/repositories/posts_repository_impl.dart'
+    as _i606;
+import 'package:match/features/posts/domain/repositories/posts_repository.dart'
+    as _i122;
+import 'package:match/features/posts/domain/usecases/get_posts.dart' as _i708;
+import 'package:match/features/posts/presentation/bloc/posts_bloc.dart'
+    as _i302;
+
+class MatchPackageModule extends _i526.MicroPackageModule {
+// initializes the registration of main-scope dependencies inside of GetIt
+  @override
+  _i687.FutureOr<void> init(_i526.GetItHelper gh) {
+    final networkModule = _$NetworkModule();
+    gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
+    gh.lazySingleton<_i957.CommentsRemoteDataSource>(
+        () => _i957.CommentsRemoteDataSourceImpl(gh<_i361.Dio>()));
+    gh.lazySingleton<_i583.CommentsRepository>(() =>
+        _i285.CommentsRepositoryImpl(gh<_i957.CommentsRemoteDataSource>()));
+    gh.lazySingleton<_i99.PostsRemoteDataSource>(
+        () => _i99.PostsRemoteDataSourceImpl(gh<_i361.Dio>()));
+    gh.lazySingleton<_i849.GetCommentsUseCase>(
+        () => _i849.GetCommentsUseCase(gh<_i583.CommentsRepository>()));
+    gh.factory<_i950.CommentsBloc>(
+        () => _i950.CommentsBloc(gh<_i849.GetCommentsUseCase>()));
+    gh.lazySingleton<_i122.PostsRepository>(
+        () => _i606.PostsRepositoryImpl(gh<_i99.PostsRemoteDataSource>()));
+    gh.lazySingleton<_i708.GetPostsUseCase>(
+        () => _i708.GetPostsUseCase(gh<_i122.PostsRepository>()));
+    gh.factory<_i302.PostsBloc>(
+        () => _i302.PostsBloc(gh<_i708.GetPostsUseCase>()));
+  }
+}
+
+class _$NetworkModule extends _i997.NetworkModule {}
