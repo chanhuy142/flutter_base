@@ -98,17 +98,23 @@ ReCase _singular(ReCase rc) {
   return rc;
 }
 
-Future<void> _updateRouter({required String feature, required String classBase}) async {
+Future<void> _updateRouter({
+  required String feature,
+  required String classBase,
+}) async {
   final File routerFile = File('lib/core/router/app_router.dart');
   if (!await routerFile.exists()) {
-    stderr.writeln('Router file not found at lib/core/router/app_router.dart. Skipped routing update.');
+    stderr.writeln(
+      'Router file not found at lib/core/router/app_router.dart. Skipped routing update.',
+    );
     return;
   }
 
   String content = await routerFile.readAsString();
 
   // 1) Ensure import exists
-  final String importLine = "import '../../features/$feature/presentation/pages/${feature}_page.dart';";
+  final String importLine =
+      "import '../../features/$feature/presentation/pages/${feature}_page.dart';";
   if (!content.contains(importLine)) {
     // Insert after the last existing import line
     final RegExp importBlock = RegExp(r"(^import .+;\s*$)+", multiLine: true);
@@ -116,10 +122,11 @@ Future<void> _updateRouter({required String feature, required String classBase})
     if (matches.isNotEmpty) {
       final RegExpMatch last = matches.last;
       final int insertIndex = last.end;
-      content = content.substring(0, insertIndex) + '\n' + importLine + content.substring(insertIndex);
+      content =
+          '${content.substring(0, insertIndex)}\n$importLine${content.substring(insertIndex)}';
     } else {
       // Fallback: prepend at top
-      content = importLine + '\n' + content;
+      content = '$importLine\n$content';
     }
   }
 
@@ -143,7 +150,10 @@ Future<void> _updateRouter({required String feature, required String classBase})
         insertAt = content.lastIndexOf(']');
       }
       if (insertAt != -1) {
-        content = content.substring(0, insertAt) + routeSnippet + content.substring(insertAt);
+        content =
+            content.substring(0, insertAt) +
+            routeSnippet +
+            content.substring(insertAt);
       } else {
         stderr.writeln('Could not locate routes list to insert new route.');
       }
@@ -179,7 +189,12 @@ abstract class ${classBase}Repository {
 }
 """;
 
-String _usecaseTemplate(String feature, String classBase, String entity, ReCase singular) =>
+String _usecaseTemplate(
+  String feature,
+  String classBase,
+  String entity,
+  ReCase singular,
+) =>
     """
 import 'package:injectable/injectable.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -217,7 +232,12 @@ extension ${singular.pascalCase}ModelMapping on ${singular.pascalCase}Model {
 }
 """;
 
-String _remoteDataSourceTemplate(String feature, String classBase, String entity, ReCase singular) =>
+String _remoteDataSourceTemplate(
+  String feature,
+  String classBase,
+  String entity,
+  ReCase singular,
+) =>
     """
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -241,7 +261,12 @@ class ${classBase}RemoteDataSourceImpl implements ${classBase}RemoteDataSource {
 }
 """;
 
-String _repositoryImplTemplate(String feature, String classBase, String entity, ReCase singular) =>
+String _repositoryImplTemplate(
+  String feature,
+  String classBase,
+  String entity,
+  ReCase singular,
+) =>
     """
 import 'package:injectable/injectable.dart';
 import '../../domain/entities/${singular.snakeCase}.dart';
@@ -262,7 +287,12 @@ class ${classBase}RepositoryImpl implements ${classBase}Repository {
 }
 """;
 
-String _blocTemplate(String feature, String classBase, String entity, ReCase singular) =>
+String _blocTemplate(
+  String feature,
+  String classBase,
+  String entity,
+  ReCase singular,
+) =>
     """
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -278,14 +308,14 @@ part '${feature}_state.dart';
 
 @injectable
 class ${classBase}Bloc extends Bloc<${classBase}Event, ${classBase}State> {
-  ${classBase}Bloc(this._get) : super(const ${classBase}State.initial()) {
+  ${classBase}Bloc(this._get) : super(const ${classBase}State()) {
     on<_Started>((event, emit) async {
-      emit(const ${classBase}State.loading());
+      emit(state.copyWith(isLoading: true, errorMessage: null));
       try {
         final List<$entity> data = await _get(const NoParams());
-        emit(${classBase}State.success(data));
+        emit(state.copyWith(isLoading: false, data: data));
       } catch (e) {
-        emit(${classBase}State.failure(e.toString()));
+        emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
       }
     });
   }
@@ -308,11 +338,12 @@ String _stateTemplate(String feature, String classBase, String entity) =>
 part of '${feature}_bloc.dart';
 
 @freezed
-class ${classBase}State with _\$${classBase}State {
-  const factory ${classBase}State.initial() = _Initial;
-  const factory ${classBase}State.loading() = _Loading;
-  const factory ${classBase}State.success(List<$entity> data) = _Success;
-  const factory ${classBase}State.failure(String message) = _Failure;
+abstract class ${classBase}State with _\$${classBase}State {
+  const factory ${classBase}State({
+    @Default(<$entity>[]) List<$entity> data,
+    @Default(false) bool isLoading,
+    String? errorMessage,
+  }) = _${classBase}State;
 }
 """;
 
@@ -331,17 +362,25 @@ class ${classBase}Page extends StatelessWidget {
       create: (_) => getIt<${classBase}Bloc>()..add(const ${classBase}Event.started()),
       child: Scaffold(
         appBar: AppBar(title: const Text('$classBase')),
-        body: BlocBuilder<${classBase}Bloc, ${classBase}State>(
+        body: BlocConsumer<${classBase}Bloc, ${classBase}State>(
+          listenWhen: (prev, curr) => prev.errorMessage != curr.errorMessage,
+          listener: (context, state) {
+            final msg = state.errorMessage;
+            if (msg != null && msg.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ' + msg)),
+              );
+            }
+          },
           builder: (context, state) {
-            return state.when(
-              initial: () => const SizedBox.shrink(),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              success: (items) => ListView.separated(
-                itemCount: items.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (_, idx) => ListTile(title: Text(items[idx].toString())),
-              ),
-              failure: (msg) => Center(child: Text('Error: \$msg')),
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final items = state.data;
+            return ListView.separated(
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (_, idx) => ListTile(title: Text(items[idx].toString())),
             );
           },
         ),
@@ -350,5 +389,3 @@ class ${classBase}Page extends StatelessWidget {
   }
 }
 """;
-
-

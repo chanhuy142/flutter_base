@@ -206,30 +206,63 @@ String toString() {
 /// @nodoc
 mixin _$PostsState {
 
-
+ List<Post> get posts; bool get isLoading; String? get errorMessage;
+/// Create a copy of PostsState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PostsStateCopyWith<PostsState> get copyWith => _$PostsStateCopyWithImpl<PostsState>(this as PostsState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostsState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostsState&&const DeepCollectionEquality().equals(other.posts, posts)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(posts),isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'PostsState()';
+  return 'PostsState(posts: $posts, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
 }
 
 /// @nodoc
-class $PostsStateCopyWith<$Res>  {
-$PostsStateCopyWith(PostsState _, $Res Function(PostsState) __);
+abstract mixin class $PostsStateCopyWith<$Res>  {
+  factory $PostsStateCopyWith(PostsState value, $Res Function(PostsState) _then) = _$PostsStateCopyWithImpl;
+@useResult
+$Res call({
+ List<Post> posts, bool isLoading, String? errorMessage
+});
+
+
+
+
+}
+/// @nodoc
+class _$PostsStateCopyWithImpl<$Res>
+    implements $PostsStateCopyWith<$Res> {
+  _$PostsStateCopyWithImpl(this._self, this._then);
+
+  final PostsState _self;
+  final $Res Function(PostsState) _then;
+
+/// Create a copy of PostsState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? posts = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+  return _then(_self.copyWith(
+posts: null == posts ? _self.posts : posts // ignore: cast_nullable_to_non_nullable
+as List<Post>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
 }
 
 
@@ -247,14 +280,11 @@ extension PostsStatePatterns on PostsState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Success value)?  success,TResult Function( _Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PostsState value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Success() when success != null:
-return success(_that);case _Failure() when failure != null:
-return failure(_that);case _:
+case _PostsState() when $default != null:
+return $default(_that);case _:
   return orElse();
 
 }
@@ -272,14 +302,11 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Success value)  success,required TResult Function( _Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PostsState value)  $default,){
 final _that = this;
 switch (_that) {
-case _Initial():
-return initial(_that);case _Loading():
-return loading(_that);case _Success():
-return success(_that);case _Failure():
-return failure(_that);case _:
+case _PostsState():
+return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -296,14 +323,11 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Success value)?  success,TResult? Function( _Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PostsState value)?  $default,){
 final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Success() when success != null:
-return success(_that);case _Failure() when failure != null:
-return failure(_that);case _:
+case _PostsState() when $default != null:
+return $default(_that);case _:
   return null;
 
 }
@@ -320,13 +344,10 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<Post> posts)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Post> posts,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Success() when success != null:
-return success(_that.posts);case _Failure() when failure != null:
-return failure(_that.message);case _:
+case _PostsState() when $default != null:
+return $default(_that.posts,_that.isLoading,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -344,13 +365,10 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<Post> posts)  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Post> posts,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
-case _Initial():
-return initial();case _Loading():
-return loading();case _Success():
-return success(_that.posts);case _Failure():
-return failure(_that.message);case _:
+case _PostsState():
+return $default(_that.posts,_that.isLoading,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -367,13 +385,10 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<Post> posts)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Post> posts,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Success() when success != null:
-return success(_that.posts);case _Failure() when failure != null:
-return failure(_that.message);case _:
+case _PostsState() when $default != null:
+return $default(_that.posts,_that.isLoading,_that.errorMessage);case _:
   return null;
 
 }
@@ -384,113 +399,51 @@ return failure(_that.message);case _:
 /// @nodoc
 
 
-class _Initial implements PostsState {
-  const _Initial();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'PostsState.initial()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Loading implements PostsState {
-  const _Loading();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loading);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'PostsState.loading()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Success implements PostsState {
-  const _Success(final  List<Post> posts): _posts = posts;
+class _PostsState implements PostsState {
+  const _PostsState({final  List<Post> posts = const <Post>[], this.isLoading = false, this.errorMessage}): _posts = posts;
   
 
  final  List<Post> _posts;
- List<Post> get posts {
+@override@JsonKey() List<Post> get posts {
   if (_posts is EqualUnmodifiableListView) return _posts;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_posts);
 }
 
+@override@JsonKey() final  bool isLoading;
+@override final  String? errorMessage;
 
 /// Create a copy of PostsState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$SuccessCopyWith<_Success> get copyWith => __$SuccessCopyWithImpl<_Success>(this, _$identity);
+_$PostsStateCopyWith<_PostsState> get copyWith => __$PostsStateCopyWithImpl<_PostsState>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Success&&const DeepCollectionEquality().equals(other._posts, _posts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostsState&&const DeepCollectionEquality().equals(other._posts, _posts)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_posts));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_posts),isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'PostsState.success(posts: $posts)';
+  return 'PostsState(posts: $posts, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$SuccessCopyWith<$Res> implements $PostsStateCopyWith<$Res> {
-  factory _$SuccessCopyWith(_Success value, $Res Function(_Success) _then) = __$SuccessCopyWithImpl;
-@useResult
+abstract mixin class _$PostsStateCopyWith<$Res> implements $PostsStateCopyWith<$Res> {
+  factory _$PostsStateCopyWith(_PostsState value, $Res Function(_PostsState) _then) = __$PostsStateCopyWithImpl;
+@override @useResult
 $Res call({
- List<Post> posts
+ List<Post> posts, bool isLoading, String? errorMessage
 });
 
 
@@ -498,85 +451,21 @@ $Res call({
 
 }
 /// @nodoc
-class __$SuccessCopyWithImpl<$Res>
-    implements _$SuccessCopyWith<$Res> {
-  __$SuccessCopyWithImpl(this._self, this._then);
+class __$PostsStateCopyWithImpl<$Res>
+    implements _$PostsStateCopyWith<$Res> {
+  __$PostsStateCopyWithImpl(this._self, this._then);
 
-  final _Success _self;
-  final $Res Function(_Success) _then;
-
-/// Create a copy of PostsState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? posts = null,}) {
-  return _then(_Success(
-null == posts ? _self._posts : posts // ignore: cast_nullable_to_non_nullable
-as List<Post>,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
-class _Failure implements PostsState {
-  const _Failure(this.message);
-  
-
- final  String message;
+  final _PostsState _self;
+  final $Res Function(_PostsState) _then;
 
 /// Create a copy of PostsState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$FailureCopyWith<_Failure> get copyWith => __$FailureCopyWithImpl<_Failure>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Failure&&(identical(other.message, message) || other.message == message));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,message);
-
-@override
-String toString() {
-  return 'PostsState.failure(message: $message)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$FailureCopyWith<$Res> implements $PostsStateCopyWith<$Res> {
-  factory _$FailureCopyWith(_Failure value, $Res Function(_Failure) _then) = __$FailureCopyWithImpl;
-@useResult
-$Res call({
- String message
-});
-
-
-
-
-}
-/// @nodoc
-class __$FailureCopyWithImpl<$Res>
-    implements _$FailureCopyWith<$Res> {
-  __$FailureCopyWithImpl(this._self, this._then);
-
-  final _Failure _self;
-  final $Res Function(_Failure) _then;
-
-/// Create a copy of PostsState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
-  return _then(_Failure(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+@override @pragma('vm:prefer-inline') $Res call({Object? posts = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+  return _then(_PostsState(
+posts: null == posts ? _self._posts : posts // ignore: cast_nullable_to_non_nullable
+as List<Post>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

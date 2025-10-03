@@ -14,29 +14,32 @@ class PostsPage extends StatelessWidget {
       create: (_) => getIt<PostsBloc>()..add(const PostsEvent.started()),
       child: Scaffold(
         appBar: AppBar(title: const Text('Posts')),
-        body: BlocBuilder<PostsBloc, PostsState>(
+        body: BlocConsumer<PostsBloc, PostsState>(
+          listenWhen: (prev, curr) => prev.errorMessage != curr.errorMessage,
+          listener: (BuildContext context, PostsState state) {
+            final String? msg = state.errorMessage;
+            if (msg != null && msg.isNotEmpty) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Error: $msg')));
+            }
+          },
           builder: (BuildContext context, PostsState state) {
-            return state.when(
-              initial: () => const SizedBox.shrink(),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              success: (List<Post> posts) => ListView.separated(
-                itemCount: posts.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (BuildContext context, int index) {
-                  final Post post = posts[index];
-                  return ListTile(
-                    title: Text(post.title),
-                    subtitle: Text(post.body),
-                    leading: CircleAvatar(child: Text(post.id.toString())),
-                  );
-                },
-              ),
-              failure: (String message) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('Error: $message'),
-                ),
-              ),
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final List<Post> posts = state.posts;
+            return ListView.separated(
+              itemCount: posts.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (BuildContext context, int index) {
+                final Post post = posts[index];
+                return ListTile(
+                  title: Text(post.title),
+                  subtitle: Text(post.body),
+                  leading: CircleAvatar(child: Text(post.id.toString())),
+                );
+              },
             );
           },
         ),
@@ -44,6 +47,3 @@ class PostsPage extends StatelessWidget {
     );
   }
 }
-
-
-
