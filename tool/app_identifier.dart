@@ -21,6 +21,8 @@ Future<void> main() async {
   if (androidId != null) {
     await _updateAndroidIds(androidId);
   }
+  // Always ensure AndroidManifest activity points to the real MainActivity package
+  await _syncAndroidMainActivityName();
   if (appName != null) {
     await _updateAndroidAppName(appName);
   }
@@ -94,6 +96,69 @@ Future<void> _updateAndroidAppName(String appName) async {
   } else {
     stderr.writeln('AndroidManifest.xml not found.');
   }
+}
+
+/// Ensure AndroidManifest's activity android:name matches the actual
+/// package declared in MainActivity.(kt|java). This avoids launch issues
+/// when applicationId/namespace differ from the Activity's package.
+Future<void> _syncAndroidMainActivityName() async {
+  final Directory kotlinDir = Directory('android/app/src/main/kotlin');
+  if (!await kotlinDir.exists()) {
+    // Kotlin directory not found; nothing to do.
+    return;
+  }
+
+  File? mainActivityFile;
+  await for (final FileSystemEntity entity in kotlinDir.list(
+    recursive: true,
+    followLinks: false,
+  )) {
+    if (entity is File &&
+        (entity.path.endsWith('MainActivity.kt') ||
+            entity.path.endsWith('MainActivity.java'))) {
+      mainActivityFile = entity;
+      break;
+    }
+  }
+
+  if (mainActivityFile == null) {
+    stderr.writeln('MainActivity not found under android/app/src/main/kotlin.');
+    return;
+  }
+
+  final String mainSrc = await mainActivityFile.readAsString();
+  final RegExp pkgRe = RegExp(
+    r'^\s*package\s+([a-zA-Z0-9_.]+)',
+    multiLine: true,
+  );
+  final RegExpMatch? m = pkgRe.firstMatch(mainSrc);
+  if (m == null) {
+    stderr.writeln('Could not detect package from MainActivity.');
+    return;
+  }
+  final String activityFqcn = '${m.group(1)}.MainActivity';
+
+  final File manifest = File('android/app/src/main/AndroidManifest.xml');
+  if (!await manifest.exists()) {
+    stderr.writeln('AndroidManifest.xml not found.');
+    return;
+  }
+
+  String manifestTxt = await manifest.readAsString();
+  final RegExp nameAttr = RegExp(
+    'android:name\\s*=\\s*["\\\'][^"\\\']*MainActivity["\\\']',
+  );
+  if (!nameAttr.hasMatch(manifestTxt)) {
+    // If not present in expected form, do not modify further.
+    stderr.writeln('android:name for MainActivity not found in manifest.');
+    return;
+  }
+  manifestTxt = manifestTxt.replaceAll(
+    nameAttr,
+    'android:name="$activityFqcn"',
+  );
+  await manifest.writeAsString(manifestTxt);
+  stdout.writeln('Synced AndroidManifest activity name → $activityFqcn');
 }
 
 Future<void> _updateIosBundleId(String bundleId) async {
