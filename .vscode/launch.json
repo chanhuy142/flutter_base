@@ -4,26 +4,10 @@
     {
       "name": "Flutter: Run",
       "request": "launch",
-      "type": "dart"
-    },
-    {
-      "name": "Flutter: Chrome",
-      "request": "launch",
       "type": "dart",
-      "deviceId": "chrome"
+      "program": "lib/main.dart"
     },
-    {
-      "name": "Flutter: Windows",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "windows"
-    },
-    {
-      "name": "Flutter: Web Server",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "web-server"
-    },
+    
     {
       "name": "Flutter: Attach",
       "request": "attach",
